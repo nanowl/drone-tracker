@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'MapSample().dart';
-import 'serverConnectTest.dart';
-// import 'dart:convert';
-
+import 'MapSample.dart';
+import 'RestScreen.dart';
 void main() async {
 
   runApp(MyApp());
@@ -12,8 +10,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Google Maps Demo',
-      home: MapSample(),
-      // home: serverConnector(),
+      // home: RetrofitScreen(),
+      // home: MapSample(),
+      home: RetrofitScreen(),
     );
   }
 }
