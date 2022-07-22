@@ -2,46 +2,55 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
-class _GoogleMapBodyState extends State<GoogleMapBody> {
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.4537251, 126.7960716),
-    zoom: 14.4746,
-  );
+class GoogleMapPage extends StatefulWidget {
+  String title;
+  GoogleMapPage({this.title});
+
+  @override
+  _GoogleMapPageState createState() => _GoogleMapPageState();
+}
+
+class _GoogleMapPageState extends State<GoogleMapPage> {
+
+  Location location;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    location = Location();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition: _kGooglePlex,
-        onCameraMove: (_) {},
-        myLocationButtonEnabled: false,
-      ),
+    return Scaffold(
+        body: FutureBuilder(
+          future: location.getLocation(),
+          builder: (BuildContext context, AsyncSnapshot<LocationData> _) {
+            if(!_.hasData){ /// 현재 내 위치데이터값이 null경우 로딩
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: LatLng(_.data.latitude, _.data.longitude),
+                zoom: 16,
+              ),
+              onTap: (_){
+
+              },
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+              circles: Set.from([Circle(
+                circleId: CircleId("location"),
+                center: LatLng(_.data.latitude, _.data.longitude),
+                strokeWidth: 1,
+                //strokeColor: Colors.blue[200],
+                radius: 500,
+              )]),
+            );
+          },)
     );
   }
-}
-
-List<Marker> _markers = [];
-
-@override
-void initState() {
-  super.initState();
-  _markers.add(Marker(
-      markerId: MarkerId("1"),
-      draggable: true,
-      onTap: () => print("Marker!"),
-      position: LatLng(37.4537251, 126.7960716)));
-}
-
-@override
-Widget build(BuildContext context) {
-  return Container(
-    child: GoogleMap(
-      mapType: MapType.normal,
-      markers: Set.from(_markers),
-      initialCameraPosition: _kGooglePlex,
-      onCameraMove: (_) {},
-      myLocationButtonEnabled: false,
-    ),
-  );
 }

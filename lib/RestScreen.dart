@@ -1,3 +1,5 @@
+import 'package:google_maps/google_maps.dart';
+import 'package:google_maps_in_flutter/model/DroneData.dart';
 import 'package:google_maps_in_flutter/retrofit/RestClient.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart';
@@ -14,65 +16,28 @@ class RetrofitScreen extends StatefulWidget {
 
 class _RetrofitScreenState extends State<RetrofitScreen> {
   late RestClient client;
-  Dio dio = Dio();
 
   @override
   void initState() {
     super.initState();
-    client = RestClient(dio);
-  }
 
-  newsCard({
-    required News news,
-  }) {
-    return Card(
-      child: Column(
-        children: [
-          Text(news.id.toString()),
-          Text(news.title),
-          Text(news.type),
-        ],
-      ),
-    );
+
+    Dio dio = Dio();
+    client = RestClient(dio);
+    Future.microtask(() async {
+      final testGetId = await client.getTopNewsId();
+      print(testGetId);
+      for (int i=0; i<testGetId.length; i++) {
+        var testGetDetail = await client.getNewsDetail(testGetId[0]);
+        print(testGetDetail);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Retrofit'),
-      ),
-      body: FutureBuilder(
-        future: client.getTopNewsId(),
-        initialData: [],
-        builder: (_, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          final ids = snapshot.data;
-
-          return ListView.builder(
-            itemCount: ids.length,
-            itemBuilder: (_, index) {
-              return FutureBuilder(
-                future: client.getNewsDetail(ids[index]),
-                builder: (_, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-
-                  return newsCard(news: snapshot.data);
-                },
-              );
-            },
-          );
-        },
-      ),
-    );
+    // TODO: implement build
+    throw UnimplementedError();
   }
+
 }
